@@ -3,121 +3,130 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sber Biometric & NFC Terminal</title>
+    <title>SberPay Terminal Simulation</title>
     <style>
         :root {
             --sber-green: #21ad3b;
             --sber-gradient: linear-gradient(135deg, #21ad3b 0%, #a8cf45 100%);
-            --bg-color: #f8f9fa;
         }
 
         body {
             margin: 0;
-            background: #1a1a1a;
+            background: #121212;
             font-family: 'Segoe UI', sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            color: #333;
         }
 
-        /* Корпус терминала */
         .device {
             width: 380px;
-            height: 700px;
+            height: 720px;
             background: white;
             border-radius: 50px;
-            border: 10px solid #333;
-            position: relative;
+            border: 8px solid #333;
             overflow: hidden;
-            box-shadow: 0 0 50px rgba(0,0,0,0.5);
-            display: flex;
-            flex-direction: column;
+            position: relative;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.5);
         }
 
-        /* Экраны */
         .screen {
             display: none;
             flex-direction: column;
             height: 100%;
-            padding: 40px 20px;
+            padding: 40px 25px;
             box-sizing: border-box;
-            animation: fadeIn 0.3s ease;
+            animation: slide 0.3s ease-out;
         }
 
         .active { display: flex; }
 
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        h1 { font-size: 24px; text-align: center; margin-bottom: 10px; }
-        p { text-align: center; color: #666; margin-bottom: 30px; }
-
-        /* --- БИОМЕТРИЯ --- */
-        .video-container {
-            position: relative;
-            width: 260px;
-            height: 340px;
-            margin: 0 auto;
-            border-radius: 130px;
-            overflow: hidden;
-            background: #000;
-            border: 4px solid #eee;
+        @keyframes slide {
+            from { transform: translateX(20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
         }
 
-        #video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transform: scaleX(-1); /* Зеркально */
-        }
-
-        .scan-line {
-            position: absolute;
-            width: 100%;
-            height: 4px;
-            background: var(--sber-green);
-            box-shadow: 0 0 15px var(--sber-green);
-            top: 20%;
-            animation: moveScan 2.5s infinite ease-in-out;
-        }
-
-        @keyframes moveScan {
-            0%, 100% { top: 20%; }
-            50% { top: 80%; }
-        }
-
-        /* --- NFC ЭКРАН --- */
-        .nfc-icon-container {
+        /* ЭКРАН 1: ЛОГОТИП И ВЫБОР СУММЫ */
+        .logo-container {
             flex-grow: 1;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
-            flex-direction: column;
         }
 
-        .nfc-waves {
-            width: 100px;
-            height: 100px;
-            border: 5px solid var(--sber-green);
+        .sber-logo {
+            width: 120px;
+            height: 120px;
+            background: var(--sber-gradient);
             border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 20px rgba(33, 173, 59, 0.3);
+        }
+
+        .sber-logo span { color: white; font-size: 50px; font-weight: bold; }
+
+        /* ЭКРАН 2: БИОМЕТРИЯ */
+        .video-box {
+            width: 240px;
+            height: 320px;
+            margin: 20px auto;
+            border-radius: 120px;
+            background: #000;
+            position: relative;
+            overflow: hidden;
+            border: 4px solid #f0f0f0;
+        }
+
+        #video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
+
+        .scan-line {
+            position: absolute;
+            width: 100%;
+            height: 5px;
+            background: var(--sber-green);
+            box-shadow: 0 0 15px var(--sber-green);
+            top: 0;
+            animation: move 3s infinite linear;
+        }
+
+        @keyframes move { 
+            0% { top: 10%; } 50% { top: 90%; } 100% { top: 10%; } 
+        }
+
+        /* ЭКРАН 3: NFC */
+        .nfc-wave-box {
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .wave {
+            width: 120px;
+            height: 120px;
+            border: 4px solid var(--sber-green);
+            border-radius: 50%;
             animation: pulse 1.5s infinite;
         }
 
         @keyframes pulse {
-            0% { transform: scale(1); opacity: 1; }
-            100% { transform: scale(1.4); opacity: 0; }
+            0% { transform: scale(0.8); opacity: 1; }
+            100% { transform: scale(1.5); opacity: 0; }
         }
 
-        /* --- КНОПКИ И ЦЕНА --- */
-        .price {
-            font-size: 32px;
-            font-weight: bold;
+        /* ОБЩИЕ ЭЛЕМЕНТЫ */
+        h1 { font-size: 22px; text-align: center; margin: 0; }
+        .amount-display {
+            font-size: 42px;
+            font-weight: 800;
             text-align: center;
-            margin: 20px 0;
+            margin: 30px 0;
+            color: #1a1a1a;
         }
 
         .btn {
@@ -127,14 +136,14 @@
             border: none;
             font-size: 16px;
             font-weight: 600;
+            margin-bottom: 15px;
             cursor: pointer;
-            margin-bottom: 12px;
             transition: 0.2s;
         }
 
         .btn-main { background: var(--sber-gradient); color: white; }
-        .btn-alt { background: #f0f0f0; color: #333; }
-        .btn:hover { opacity: 0.9; }
+        .btn-grey { background: #f2f2f2; color: #333; }
+        .btn:active { transform: scale(0.96); }
 
     </style>
 </head>
@@ -142,70 +151,75 @@
 
 <div class="device">
     
-    <div id="face-screen" class="screen active">
+    <div id="screen-start" class="screen active">
+        <div class="logo-container">
+            <div class="sber-logo"><span>S</span></div>
+            <h2 style="color: #1a1a1a; margin-top: 0;">SberPay</h2>
+            <p style="color: #666;">Выберите сумму для теста</p>
+        </div>
+        <button class="btn btn-main" onclick="selectAmount(100)">Оплатить 100 ₽</button>
+        <button class="btn btn-main" onclick="selectAmount(500)">Оплатить 500 ₽</button>
+    </div>
+
+    <div id="screen-face" class="screen">
         <h1>Оплата лицом</h1>
-        <p>Смотрите в камеру</p>
-        
-        <div class="video-container">
+        <p style="text-align:center; color:#666;">Смотрите в камеру</p>
+        <div class="video-box">
             <video id="video" autoplay playsinline></video>
             <div class="scan-line"></div>
         </div>
-
-        <div class="price">1 590,00 ₽</div>
-
-        <div style="margin-top: auto;">
-            <button class="btn btn-main" onclick="processPayment()">Оплатить</button>
-            <button class="btn btn-alt" onclick="switchScreen('nfc-screen')">Картой или телефоном</button>
+        <div class="amount-display" id="val-face">0 ₽</div>
+        <div style="margin-top:auto">
+            <button class="btn btn-main" onclick="finish()">Оплатить улыбкой</button>
+            <button class="btn btn-grey" onclick="showScreen('screen-nfc')">Картой / СБП</button>
         </div>
     </div>
 
-    <div id="nfc-screen" class="screen">
+    <div id="screen-nfc" class="screen">
         <h1>Приложите карту</h1>
-        <p>Или телефон для оплаты</p>
-
-        <div class="nfc-icon-container">
-            <div class="nfc-waves">
-                <svg width="50" height="50" viewBox="0 0 24 24" fill="var(--sber-green)">
-                    <path d="M20,2H4C2.9,2,2,2.9,2,4v16c0,1.1,0.9,2,2,2h16c1.1,0,2-0.9,2-2V4C22,2.9,21.1,2,20,2z M20,20H4V4h16V20z M18,6h-5c-1.1,0-2,0.9-2,2v8c0,1.1,0.9,2,2,2h5v-2h-5V8h5V6z"/>
-                </svg>
-            </div>
-            <div style="margin-top: 40px; font-weight: 500; color: var(--sber-green);">Ожидание сигнала...</div>
+        <p style="text-align:center; color:#666;">Или телефон к терминалу</p>
+        <div class="nfc-wave-box">
+            <div class="wave"></div>
         </div>
-
-        <div class="price">1 590,00 ₽</div>
-
-        <div style="margin-top: auto;">
-            <button class="btn btn-alt" onclick="switchScreen('face-screen')">Вернуться к биометрии</button>
+        <div class="amount-display" id="val-nfc">0 ₽</div>
+        <div style="margin-top:auto">
+            <button class="btn btn-grey" onclick="showScreen('screen-face')">Вернуться к биометрии</button>
         </div>
     </div>
 
 </div>
 
 <script>
-    // Работа с камерой
-    const video = document.getElementById('video');
+    let currentAmount = 0;
 
-    async function setupCamera() {
+    function showScreen(id) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        
+        // Если переходим на экран с камерой
+        if(id === 'screen-face') startCamera();
+    }
+
+    function selectAmount(sum) {
+        currentAmount = sum;
+        document.getElementById('val-face').innerText = sum + ' ₽';
+        document.getElementById('val-nfc').innerText = sum + ' ₽';
+        showScreen('screen-face');
+    }
+
+    async function startCamera() {
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-            video.srcObject = stream;
+            document.getElementById('video').srcObject = stream;
         } catch (err) {
-            console.error("Ошибка доступа к камере: ", err);
+            console.log("Камера недоступна");
         }
     }
 
-    // Переключение экранов
-    function switchScreen(screenId) {
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        document.getElementById(screenId).classList.add('active');
+    function finish() {
+        alert("Оплата на сумму " + currentAmount + " ₽ прошла успешно!");
+        location.reload(); // Возврат в начало
     }
-
-    function processPayment() {
-        alert("Платеж успешно обработан!");
-    }
-
-    // Запуск камеры при загрузке
-    setupCamera();
 </script>
 
 </body>
