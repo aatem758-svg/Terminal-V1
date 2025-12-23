@@ -3,32 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SberPay Terminal Simulation</title>
+    <title>SberPay Terminal Full Cycle</title>
     <style>
         :root {
             --sber-green: #21ad3b;
             --sber-gradient: linear-gradient(135deg, #21ad3b 0%, #a8cf45 100%);
+            --bg-white: #ffffff;
         }
 
         body {
             margin: 0;
             background: #121212;
-            font-family: 'Segoe UI', sans-serif;
+            font-family: 'Segoe UI', -apple-system, sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
+            height: 100vh;
+            color: #333;
         }
 
-        .device {
+        .terminal {
             width: 380px;
-            height: 720px;
-            background: white;
-            border-radius: 50px;
-            border: 8px solid #333;
-            overflow: hidden;
+            height: 780px;
+            background: var(--bg-white);
+            border-radius: 54px;
+            border: 10px solid #2c2c2e;
             position: relative;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+            overflow: hidden;
+            box-shadow: 0 40px 80px rgba(0,0,0,0.6);
+            display: flex;
+            flex-direction: column;
         }
 
         .screen {
@@ -37,188 +41,182 @@
             height: 100%;
             padding: 40px 25px;
             box-sizing: border-box;
-            animation: slide 0.3s ease-out;
+            animation: fadeIn 0.4s ease;
         }
 
         .active { display: flex; }
 
-        @keyframes slide {
-            from { transform: translateX(20px); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* ЭКРАН 1: ЛОГОТИП И ВЫБОР СУММЫ */
-        .logo-container {
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
+        /* ЭКРАН 0: ПРИВЕТСТВИЕ */
+        #scr-welcome {
+            background: #fff;
             justify-content: center;
             align-items: center;
+            text-align: center;
+            cursor: pointer;
+        }
+        .welcome-title {
+            font-size: 36px;
+            font-weight: 700;
+            line-height: 1.2;
+            color: #1a1a1a;
+        }
+        .tap-hint {
+            margin-top: 20px;
+            color: #999;
+            font-size: 16px;
         }
 
-        .sber-logo {
-            width: 120px;
-            height: 120px;
+        /* ЭКРАН 1: ВЫБОР СУММЫ */
+        .logo-sber {
+            width: 80px; height: 80px;
             background: var(--sber-gradient);
             border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: 20px;
-            box-shadow: 0 10px 20px rgba(33, 173, 59, 0.3);
+            display: flex; justify-content: center; align-items: center;
+            margin: 0 auto 30px;
         }
 
-        .sber-logo span { color: white; font-size: 50px; font-weight: bold; }
-
         /* ЭКРАН 2: БИОМЕТРИЯ */
-        .video-box {
-            width: 240px;
-            height: 320px;
+        .face-area {
+            width: 260px; height: 350px;
             margin: 20px auto;
-            border-radius: 120px;
+            border-radius: 130px;
             background: #000;
             position: relative;
             overflow: hidden;
-            border: 4px solid #f0f0f0;
+            border: 3px solid #f0f0f0;
         }
-
         #video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
-
         .scan-line {
-            position: absolute;
-            width: 100%;
-            height: 5px;
+            position: absolute; width: 100%; height: 4px;
             background: var(--sber-green);
             box-shadow: 0 0 15px var(--sber-green);
-            top: 0;
-            animation: move 3s infinite linear;
+            top: 10%; animation: scan 2.5s infinite linear;
         }
-
-        @keyframes move { 
-            0% { top: 10%; } 50% { top: 90%; } 100% { top: 10%; } 
-        }
+        @keyframes scan { 0%, 100% { top: 10%; } 50% { top: 90%; } }
 
         /* ЭКРАН 3: NFC */
-        .nfc-wave-box {
+        .nfc-zone {
             flex-grow: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
         }
-
-        .wave {
-            width: 120px;
-            height: 120px;
-            border: 4px solid var(--sber-green);
-            border-radius: 50%;
-            animation: pulse 1.5s infinite;
+        .nfc-circle {
+            width: 130px; height: 130px;
+            border: 3px solid #eee; border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            transition: 0.3s;
         }
+        .reading { border-color: var(--sber-green); background: #eaffed; }
 
-        @keyframes pulse {
-            0% { transform: scale(0.8); opacity: 1; }
-            100% { transform: scale(1.5); opacity: 0; }
-        }
-
-        /* ОБЩИЕ ЭЛЕМЕНТЫ */
-        h1 { font-size: 22px; text-align: center; margin: 0; }
-        .amount-display {
-            font-size: 42px;
-            font-weight: 800;
-            text-align: center;
-            margin: 30px 0;
-            color: #1a1a1a;
-        }
-
+        /* ОБЩИЕ СТИЛИ */
+        .price { font-size: 46px; font-weight: 800; text-align: center; margin: 30px 0; }
         .btn {
-            width: 100%;
-            padding: 18px;
-            border-radius: 20px;
-            border: none;
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 15px;
-            cursor: pointer;
-            transition: 0.2s;
+            width: 100%; height: 65px; border-radius: 22px;
+            border: none; font-size: 18px; font-weight: 600;
+            margin-bottom: 12px; cursor: pointer; transition: 0.2s;
         }
+        .btn-primary { background: var(--sber-gradient); color: white; }
+        .btn-secondary { background: #f2f2f2; color: #333; }
+        .btn:active { transform: scale(0.97); }
 
-        .btn-main { background: var(--sber-gradient); color: white; }
-        .btn-grey { background: #f2f2f2; color: #333; }
-        .btn:active { transform: scale(0.96); }
-
+        .success-page {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: #fff; display: none; flex-direction: column;
+            justify-content: center; align-items: center; z-index: 10;
+        }
     </style>
 </head>
 <body>
 
-<div class="device">
+<div class="terminal">
     
-    <div id="screen-start" class="screen active">
-        <div class="logo-container">
-            <div class="sber-logo"><span>S</span></div>
-            <h2 style="color: #1a1a1a; margin-top: 0;">SberPay</h2>
-            <p style="color: #666;">Выберите сумму для теста</p>
-        </div>
-        <button class="btn btn-main" onclick="selectAmount(100)">Оплатить 100 ₽</button>
-        <button class="btn btn-main" onclick="selectAmount(500)">Оплатить 500 ₽</button>
+    <div id="scr-welcome" class="screen active" onclick="goTo('scr-select')">
+        <div class="welcome-title">Платите,<br>как вам удобно</div>
+        <div class="tap-hint">Коснитесь экрана, чтобы начать</div>
     </div>
 
-    <div id="screen-face" class="screen">
-        <h1>Оплата лицом</h1>
-        <p style="text-align:center; color:#666;">Смотрите в камеру</p>
-        <div class="video-box">
+    <div id="scr-select" class="screen">
+        <div class="logo-sber">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="white"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm4.59-12.42L10 14.17l-2.59-2.58L6 13l4 4 8-8z"/></svg>
+        </div>
+        <h1 style="text-align: center; margin-bottom: 40px;">Выберите сумму</h1>
+        <button class="btn btn-primary" onclick="initPayment(100)">100 ₽</button>
+        <button class="btn btn-primary" onclick="initPayment(500)">500 ₽</button>
+        <button class="btn btn-secondary" onclick="goTo('scr-welcome')">Отмена</button>
+    </div>
+
+    <div id="scr-face" class="screen">
+        <h2 style="text-align: center;">Оплата лицом</h2>
+        <div class="face-area">
             <video id="video" autoplay playsinline></video>
             <div class="scan-line"></div>
         </div>
-        <div class="amount-display" id="val-face">0 ₽</div>
-        <div style="margin-top:auto">
-            <button class="btn btn-main" onclick="finish()">Оплатить улыбкой</button>
-            <button class="btn btn-grey" onclick="showScreen('screen-nfc')">Картой / СБП</button>
+        <div class="price" id="p-face">0 ₽</div>
+        <div style="margin-top: auto;">
+            <button class="btn btn-primary" onclick="showSuccess()">Оплатить</button>
+            <button class="btn btn-secondary" onclick="goTo('scr-nfc')">Картой / Телефоном</button>
         </div>
     </div>
 
-    <div id="screen-nfc" class="screen">
-        <h1>Приложите карту</h1>
-        <p style="text-align:center; color:#666;">Или телефон к терминалу</p>
-        <div class="nfc-wave-box">
-            <div class="wave"></div>
+    <div id="scr-nfc" class="screen">
+        <h2 style="text-align: center;">Приложите карту</h2>
+        <div class="nfc-zone" onclick="simulateNFC()">
+            <div class="nfc-circle" id="nfc-ui">
+                <svg width="60" height="60" viewBox="0 0 24 24" fill="#ccc"><path d="M20 2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 18H4V4h16v16zM18 6h-5c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h5v-2h-5V8h5V6z"/></svg>
+            </div>
+            <p id="nfc-text" style="color: #999; margin-top: 20px;">Нажмите для имитации касания</p>
         </div>
-        <div class="amount-display" id="val-nfc">0 ₽</div>
-        <div style="margin-top:auto">
-            <button class="btn btn-grey" onclick="showScreen('screen-face')">Вернуться к биометрии</button>
+        <div class="price" id="p-nfc">0 ₽</div>
+        <button class="btn btn-secondary" onclick="goTo('scr-face')">К биометрии</button>
+    </div>
+
+    <div id="scr-success" class="success-page">
+        <div class="logo-sber" style="width: 120px; height: 120px;">
+            <svg width="70" height="70" viewBox="0 0 24 24" fill="white"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
         </div>
+        <h1 style="font-size: 32px; margin: 20px 0 5px;">Оплачено</h1>
+        <p id="p-success" style="font-size: 24px; color: #666;"></p>
+        <button class="btn btn-secondary" style="width: 200px; margin-top: 50px;" onclick="location.reload()">Закрыть</button>
     </div>
 
 </div>
 
 <script>
-    let currentAmount = 0;
+    let finalAmount = 0;
 
-    function showScreen(id) {
+    function goTo(id) {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
         document.getElementById(id).classList.add('active');
-        
-        // Если переходим на экран с камерой
-        if(id === 'screen-face') startCamera();
+        if(id === 'scr-face') startCamera();
     }
 
-    function selectAmount(sum) {
-        currentAmount = sum;
-        document.getElementById('val-face').innerText = sum + ' ₽';
-        document.getElementById('val-nfc').innerText = sum + ' ₽';
-        showScreen('screen-face');
+    function initPayment(sum) {
+        finalAmount = sum;
+        document.getElementById('p-face').innerText = sum + ' ₽';
+        document.getElementById('p-nfc').innerText = sum + ' ₽';
+        document.getElementById('p-success').innerText = sum + ' ₽';
+        goTo('scr-face');
     }
 
     async function startCamera() {
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ video: true });
             document.getElementById('video').srcObject = stream;
-        } catch (err) {
-            console.log("Камера недоступна");
-        }
+        } catch (e) { console.warn("Камера не активна"); }
     }
 
-    function finish() {
-        alert("Оплата на сумму " + currentAmount + " ₽ прошла успешно!");
-        location.reload(); // Возврат в начало
+    function simulateNFC() {
+        const ui = document.getElementById('nfc-ui');
+        const txt = document.getElementById('nfc-text');
+        ui.classList.add('reading');
+        txt.innerText = "Считывание...";
+        setTimeout(showSuccess, 1200);
+    }
+
+    function showSuccess() {
+        document.getElementById('scr-success').style.display = 'flex';
     }
 </script>
 
